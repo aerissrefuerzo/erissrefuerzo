@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resume Builder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span id="agency-name" class="agency"></span>
+      <span id="agency-tagline" class="tagline"></span>
+    </div>
+    <div class="toolbar">
+      <button type="button" data-action="export" data-embed-hide><svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Save file</button>
+      <label class="button">
+        <svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Open file
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
+      </label>
+      <button type="button" data-action="print" class="primary" data-embed-hide><svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 14h10v7H7z"/></svg>Print / PDF</button>
+      <button type="button" data-action="reset" class="danger">Clear my data</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="editor" aria-label="Resume editor">
+      <div class="panel">
+        <h2>Profile</h2>
+        <label for="profile">Start from a layout</label>
+        <select id="profile"></select>
+        <p id="profile-desc" class="hint"></p>
+      </div>
+
+      <div class="panel">
+        <h2>Personal information</h2>
+        <div id="personal" class="grid"></div>
+      </div>
+
+      <div id="sections"></div>
+
+      <div class="panel add-section">
+        <h2>Add a section</h2>
+        <div class="row">
+          <label for="add-type" class="sr-only">Section type</label>
+          <select id="add-type"></select>
+          <button type="button" data-action="add-section" class="primary">Add</button>
+        </div>
+      </div>
+
+      <p id="privacy-note" class="hint privacy"></p>
+      <p id="embed-note" class="hint privacy" hidden>Print / PDF and Save file are turned off in this preview. They work when you open index.html from the repository.</p>
+    </section>
+
+    <section class="preview-wrap" aria-label="Resume preview">
+      <article id="preview" class="page"></article>
+    </section>
+  </main>
+
+  <dialog id="ask" aria-labelledby="ask-message">
+    <form method="dialog">
+      <p id="ask-message"></p>
+      <div class="dialog-actions">
+        <button id="ask-cancel" type="submit" value="cancel">Cancel</button>
+        <button id="ask-ok" type="submit" value="ok" class="primary">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
