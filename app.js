@@ -287,6 +287,10 @@
         const n = parseFloat(raw);
         return n > 0 ? String(n) : '';
       }
+      if (f.type === 'select') {
+        const match = f.options.slice(1).find((o) => o.toLowerCase() === str(raw).toLowerCase());
+        return match || '';
+      }
       return str(raw);
     };
 
@@ -453,7 +457,8 @@
     };
     const dates = pick('date') ? formatDate(pick('date'))
       : [formatDate(pick('start')), formatDate(pick('end'))].filter(Boolean).join(' – ');
-    return { title: pick('title'), sub: [pick('subtitle'), dates].filter(Boolean).join(' · ') };
+    const title = [pick('title'), pick('honor')].filter(Boolean).join(', ');
+    return { title, sub: [pick('subtitle'), dates].filter(Boolean).join(' · ') };
   }
 
   function entrySummary(section, type, entry, index) {
@@ -497,7 +502,7 @@
     const v = draft.values[f.key];
     const req = f.required ? ' aria-required="true"' : '';
     const bind = `data-draft="${id}|${f.key}`;
-    const wide = f.type === 'textarea' || f.role === 'title' || f.role === 'subtitle';
+    const wide = f.wide !== undefined ? f.wide : f.type === 'textarea' || f.role === 'title' || f.role === 'subtitle';
     let control;
 
     if (f.type === 'monthyear') {
@@ -513,6 +518,12 @@
           <select ${bind}|y" aria-label="${esc(f.label)} year"${req}${v.present ? ' disabled' : ''}${invalidAttrs(errId, message)}>${years}</select>
         </div>
         ${f.present ? `<label class="check"><input type="checkbox" ${bind}|present"${v.present ? ' checked' : ''}> Present</label>` : ''}`;
+    } else if (f.type === 'select') {
+      control = `<select id="${fid}" ${bind}"${req}${invalidAttrs(errId, message)}>` +
+        f.options.map((o, i) => {
+          const val = i === 0 ? '' : o;
+          return `<option value="${esc(val)}"${v === val ? ' selected' : ''}>${esc(o)}</option>`;
+        }).join('') + '</select>';
     } else if (f.type === 'textarea') {
       control = `<textarea id="${fid}" ${bind}"${req}${invalidAttrs(errId, message)}>${esc(v)}</textarea>`;
     } else if (f.type === 'number') {
@@ -564,6 +575,7 @@
 
   function previewEntry(type, entry) {
     const byRole = {};
+    const bodyField = type.fields.find((f) => f.role === 'body');
     type.fields.forEach((f) => {
       let v = (entry[f.key] || '').trim();
       if (!v) return;
@@ -573,7 +585,8 @@
     });
 
     const lines = (byRole.body || '').split('\n').map((l) => l.replace(/^\s*[-*•]\s*/, '').trim()).filter(Boolean);
-    const bodyHtml = lines.length > 1
+    const bullets = lines.length > 1 || (bodyField && bodyField.list);
+    const bodyHtml = lines.length && bullets
       ? `<ul>${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`
       : lines.length ? `<p>${esc(lines[0])}</p>` : '';
 
@@ -582,7 +595,7 @@
       : [byRole.start, byRole.end].filter(Boolean).map(esc).join(' &ndash; ');
 
     return `<div class="r-entry">
-      <div class="r-line"><span class="r-title">${esc(byRole.title || '')}</span>${dates ? `<span class="r-dates">${dates}</span>` : ''}</div>
+      <div class="r-line"><span class="r-title">${esc(byRole.title || '')}${byRole.honor ? `, <em class="r-honor">${esc(byRole.honor)}</em>` : ''}</span>${dates ? `<span class="r-dates">${dates}</span>` : ''}</div>
       ${byRole.subtitle || byRole.meta ? `<div class="r-line"><span class="r-sub">${esc(byRole.subtitle || '')}</span><span class="r-meta">${esc(byRole.meta || '')}</span></div>` : ''}
       ${bodyHtml}
     </div>`;
