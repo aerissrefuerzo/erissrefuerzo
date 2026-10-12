@@ -48,3 +48,7 @@ fonts/       IBM Plex Serif, the resume typeface (SIL Open Font License)
 - Not a replacement for the CSC Personal Data Sheet (CS Form 212), which has a fixed official format.
 - Local storage autosave is per browser. On shared or kiosk computers, users should click **Clear my data** when done.
 - Single resume template (layout style). Additional templates are on the roadmap.
+
+## Grain & Type (photo tool)
+
+`grain/index.html` is a separate, standalone tool: open a photo, add film grain (ISO presets, amount, size, midtone bias, color grain) and overlay display-serif text (Fraunces by default, plus other Google Fonts serifs). Drag the text to position it. Exports full-resolution JPEG or PNG. Runs entirely in the browser; needs internet only for the fonts.
