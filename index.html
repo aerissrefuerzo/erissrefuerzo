@@ -13,12 +13,12 @@
       <span id="agency-tagline" class="tagline"></span>
     </div>
     <div class="toolbar">
-      <button type="button" data-action="export">Save file</button>
+      <button type="button" data-action="export" data-embed-hide>Save file</button>
       <label class="button">
         Open file
         <input id="import-file" type="file" accept="application/json,.json" hidden>
       </label>
-      <button type="button" data-action="print" class="primary">Print / PDF</button>
+      <button type="button" data-action="print" class="primary" data-embed-hide>Print / PDF</button>
       <button type="button" data-action="reset" class="danger">Clear my data</button>
     </div>
   </header>
@@ -49,12 +49,23 @@
       </div>
 
       <p id="privacy-note" class="hint privacy"></p>
+      <p id="embed-note" class="hint privacy" hidden>Print / PDF and Save file are turned off in this preview. They work when you open index.html from the repository.</p>
     </section>
 
     <section class="preview-wrap" aria-label="Resume preview">
       <article id="preview" class="page"></article>
     </section>
   </main>
+
+  <dialog id="ask" aria-labelledby="ask-message">
+    <form method="dialog">
+      <p id="ask-message"></p>
+      <div class="dialog-actions">
+        <button id="ask-cancel" type="submit" value="cancel">Cancel</button>
+        <button id="ask-ok" type="submit" value="ok" class="primary">OK</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="config.js"></script>
   <script src="app.js"></script>

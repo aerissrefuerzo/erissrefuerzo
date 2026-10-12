@@ -8,7 +8,16 @@
   // Editor-only UI state; not saved with the resume.
   const collapsed = new Set();
 
-  let state = loadSaved() || newResume(CFG.defaultProfile);
+  // RB_SAMPLE (optional) pre-fills a demo resume for first-time visitors.
+  let state = loadSaved() || sampleResume() || newResume(CFG.defaultProfile);
+
+  function sampleResume() {
+    try {
+      return window.RB_SAMPLE ? sanitize(window.RB_SAMPLE) : null;
+    } catch (e) {
+      return null;
+    }
+  }
 
   // ---------- Model ----------
 
@@ -67,7 +76,7 @@
   }
 
   // Switch layout: keep content of sections whose type exists in the new profile.
-  function applyProfile(profileId) {
+  async function applyProfile(profileId) {
     const profile = getProfile(profileId);
     const oldProfile = getProfile(state.profileId);
     const defaultTitle = (p, type) => {
@@ -86,9 +95,9 @@
     const dropped = remaining.filter(hasContent);
     if (dropped.length) {
       const names = dropped.map((s) => '- ' + s.title).join('\n');
-      const keep = confirm(
-        'These sections have content and are not part of the new layout:\n\n' + names +
-        '\n\nOK = keep them at the end.  Cancel = remove them.'
+      const keep = await ask(
+        'These sections have content and are not part of the new layout:\n\n' + names,
+        'Keep them at the end', 'Remove them'
       );
       if (keep) next.push(...dropped);
     }
@@ -162,7 +171,7 @@
         collapsed.clear();
         commit(true);
       } catch (e) {
-        alert('Could not open this file: ' + e.message);
+        ask('Could not open this file. ' + e.message, 'OK', null);
       }
     };
     reader.readAsText(file);
@@ -356,7 +365,22 @@
     commit(false);
   }
 
-  function onClick(e) {
+  // In-page replacement for confirm()/alert(), which embedded browsers may block.
+  // Resolves true for OK, false for cancel. Pass cancelLabel = null for a message with one button.
+  function ask(message, okLabel, cancelLabel) {
+    const dialog = $('#ask');
+    $('#ask-message').textContent = message;
+    $('#ask-ok').textContent = okLabel || 'OK';
+    $('#ask-cancel').textContent = cancelLabel || 'Cancel';
+    $('#ask-cancel').hidden = cancelLabel === null;
+    return new Promise((resolve) => {
+      dialog.addEventListener('close', () => resolve(dialog.returnValue === 'ok'), { once: true });
+      dialog.returnValue = '';
+      dialog.showModal();
+    });
+  }
+
+  async function onClick(e) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const { action, sid, eid } = btn.dataset;
@@ -368,7 +392,8 @@
       case 'export': return exportFile();
       case 'print': return window.print();
       case 'reset':
-        if (!confirm('Clear all resume data from this browser? Save a file first if you want to keep it.')) return;
+        if (!(await ask('Clear all resume data from this browser? Save a file first if you want to keep it.',
+          'Clear data', 'Cancel'))) return;
         try { localStorage.removeItem(STORAGE_KEY); } catch (err) { /* ignore */ }
         state = newResume(state.profileId);
         collapsed.clear();
@@ -390,7 +415,7 @@
       case 'section-down': move(state.sections, index, 1); break;
       case 'toggle-visible': section.visible = !section.visible; break;
       case 'delete-section':
-        if (hasContent(section) && !confirm(`Remove "${section.title}" and its content?`)) return;
+        if (hasContent(section) && !(await ask(`Remove "${section.title}" and its content?`, 'Remove', 'Cancel'))) return;
         state.sections.splice(index, 1);
         break;
       case 'add-entry': section.content.push(newEntry()); break;
@@ -409,11 +434,16 @@
     $('#agency-name').textContent = agency.name;
     $('#agency-tagline').textContent = agency.tagline;
     $('#privacy-note').textContent = agency.privacyNote;
+    // Set by hosts that block printing and downloads (e.g. a sandboxed preview).
+    if (window.RB_EMBED) {
+      document.querySelectorAll('[data-embed-hide]').forEach((el) => { el.hidden = true; });
+      $('#embed-note').hidden = false;
+    }
 
     document.addEventListener('input', onInput);
     document.addEventListener('click', onClick);
-    $('#profile').addEventListener('change', (e) => {
-      applyProfile(e.target.value);
+    $('#profile').addEventListener('change', async (e) => {
+      await applyProfile(e.target.value);
       commit(true);
     });
     $('#import-file').addEventListener('change', (e) => {
