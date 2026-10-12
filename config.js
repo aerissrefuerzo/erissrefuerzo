@@ -34,10 +34,14 @@ window.RB_CONFIG = {
    *   entries - repeatable items, each with the listed fields
    *
    * Entry field options:
-   *   role      where it appears in the preview: title, subtitle, meta, start, end, date, body
-   *   type      text (default), textarea, monthyear, number, contact
+   *   role      where it appears in the preview: title, honor (bold italic after
+   *             the title), subtitle, meta, start, end, date, body
+   *   type      text (default), textarea, select, monthyear, number, contact
    *   required  entry cannot be saved without it
    *   present   (monthyear only) offer a "Present" option
+   *   options   (select only) choices; the first one means "none"
+   *   list      (textarea only) always show as bullets, one per line
+   *   wide      true/false to force full or half width in the editor
    *
    * `core: true` sections are the standard ones every resume has. The rest are
    * offered under "Add a section".
@@ -54,7 +58,7 @@ window.RB_CONFIG = {
         { key: 'location', label: 'Location', role: 'meta' },
         { key: 'start', label: 'Start date', role: 'start', type: 'monthyear', required: true },
         { key: 'end', label: 'End date', role: 'end', type: 'monthyear', required: true, present: true },
-        { key: 'description', label: 'Duties and accomplishments (one per line)', role: 'body', type: 'textarea' },
+        { key: 'description', label: 'Duties and accomplishments (one per line)', role: 'body', type: 'textarea', list: true },
       ],
     },
     education: {
@@ -62,12 +66,16 @@ window.RB_CONFIG = {
       kind: 'entries',
       core: true,
       fields: [
-        { key: 'degree', label: 'Degree / program', role: 'title', required: true },
+        { key: 'degree', label: 'Degree / program', role: 'title', required: true, wide: false },
+        {
+          key: 'honor', label: 'Latin honors', role: 'honor', type: 'select',
+          options: ['None', 'Cum Laude', 'Magna Cum Laude', 'Summa Cum Laude'],
+        },
         { key: 'school', label: 'School', role: 'subtitle', required: true },
         { key: 'location', label: 'Location', role: 'meta' },
         { key: 'start', label: 'Start date', role: 'start', type: 'monthyear' },
         { key: 'end', label: 'Graduation date', role: 'end', type: 'monthyear', required: true, present: true },
-        { key: 'details', label: 'Honors / details', role: 'body', type: 'textarea' },
+        { key: 'details', label: 'Achievements and details (one per line)', role: 'body', type: 'textarea', list: true },
       ],
     },
     skills: { label: 'Skills', kind: 'tags', core: true, placeholder: 'e.g. Project management, Data analysis, MS Excel' },
@@ -110,7 +118,7 @@ window.RB_CONFIG = {
         { key: 'organization', label: 'Organization', role: 'subtitle', required: true },
         { key: 'start', label: 'Start date', role: 'start', type: 'monthyear', required: true },
         { key: 'end', label: 'End date', role: 'end', type: 'monthyear', required: true, present: true },
-        { key: 'description', label: 'Description (one per line)', role: 'body', type: 'textarea' },
+        { key: 'description', label: 'Description (one per line)', role: 'body', type: 'textarea', list: true },
       ],
     },
     references: {
@@ -130,7 +138,7 @@ window.RB_CONFIG = {
         { key: 'title', label: 'Title', role: 'title', required: true },
         { key: 'subtitle', label: 'Subtitle', role: 'subtitle' },
         { key: 'date', label: 'Date', role: 'date', type: 'monthyear' },
-        { key: 'details', label: 'Details (one per line)', role: 'body', type: 'textarea' },
+        { key: 'details', label: 'Details (one per line)', role: 'body', type: 'textarea', list: true },
       ],
     },
   },

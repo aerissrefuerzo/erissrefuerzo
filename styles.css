@@ -1,3 +1,9 @@
+/* Resume typeface, bundled so it works offline. SIL Open Font License (fonts/OFL.txt). */
+@font-face { font-family: "IBM Plex Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/ibm-plex-serif-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Serif"; font-style: italic; font-weight: 400; font-display: swap; src: url("fonts/ibm-plex-serif-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Serif"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/ibm-plex-serif-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Serif"; font-style: italic; font-weight: 700; font-display: swap; src: url("fonts/ibm-plex-serif-latin-700-italic.woff2") format("woff2"); }
+
 :root {
   --brand: #1f4e79;
   --bg: #eef1f5;
@@ -163,12 +169,15 @@ label.check input { width: auto; }
   padding: 18mm 16mm;
   box-shadow: 0 2px 10px rgba(0,0,0,.12);
   /* One typeface for the whole resume; hierarchy comes from size and weight only. */
-  --r-font: Georgia, "Times New Roman", Times, serif;
-  --r-base: 10.5pt;
-  --r-small: 9.5pt;
+  --r-font: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --r-base: 10pt;
+  --r-small: 9pt;
   font-family: var(--r-font);
   font-size: var(--r-base);
-  line-height: 1.4;
+  line-height: 1.45;
+  /* Ligatures (fi, fl) can come out as odd characters when an ATS extracts PDF text. */
+  font-variant-ligatures: none;
+  font-kerning: normal;
 }
 .page * { font-family: inherit; }
 .r-header { text-align: center; border-bottom: 2px solid var(--brand); padding-bottom: 8px; margin-bottom: 12px; }
@@ -184,6 +193,7 @@ label.check input { width: auto; }
 .r-entry { margin-bottom: 8px; break-inside: avoid; }
 .r-line { display: flex; justify-content: space-between; gap: 12px; }
 .r-title { font-weight: 700; }
+.r-honor { font-weight: 700; font-style: italic; }
 .r-dates, .r-meta { font-size: var(--r-small); color: #333; text-align: right; }
 .r-dates { white-space: nowrap; }
 .r-sub { color: #333; }
