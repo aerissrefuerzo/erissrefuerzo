@@ -238,7 +238,7 @@ about it?</textarea>
         <button class="btn primary" id="download" type="button">Download</button>
         <button class="btn" id="copy" type="button">Copy image</button>
       </div>
-      <p class="note">Exports at the photo's full resolution. If Download does nothing (some embedded viewers block it), use Copy image and paste it anywhere.</p>
+      <p class="note">Exports at the photo's full resolution. If Download is blocked where you opened this, use Copy image and paste it anywhere.</p>
       <p class="status" id="status" role="status"></p>
     </fieldset>
   </aside>
@@ -506,6 +506,9 @@ about it?</textarea>
   });
 
   // ---------- export ----------
+  // Inside the Claude artifact viewer, file saves go through the downloads capability.
+  let downloads = null;
+  window.claude?.use?.("downloads").then((d) => { downloads = d; }).catch(() => {});
   function status(msg) { $("status").textContent = msg; }
   async function fullRes(type) {
     status("Rendering full resolution…");
@@ -519,12 +522,23 @@ about it?</textarea>
     const type = $("format").value;
     const blob = await fullRes(type);
     if (!blob) { status("Export failed. The image may be too large for this browser."); return; }
+    const name = `${fileName}-grain.${type === "image/png" ? "png" : "jpg"}`;
+    const size = `${(blob.size / 1048576).toFixed(1)} MB`;
+    if (downloads) {
+      try { await downloads.save({ filename: name, data: blob }); status(`Saved ${name} (${size}).`); }
+      catch (e) {
+        if (e && e.code === "declined") status("Save cancelled.");
+        else if (e && e.code === "rate_limited") status("A save prompt is already open. Finish it, then try again.");
+        else status("Saving isn't available here. Use Copy image instead.");
+      }
+      return;
+    }
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `${fileName}-grain.${type === "image/png" ? "png" : "jpg"}`;
+    a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-    status(`Saved ${a.download} (${(blob.size / 1048576).toFixed(1)} MB).`);
+    status(`Saved ${name} (${size}).`);
   });
   $("copy").addEventListener("click", () => {
     if (!navigator.clipboard || !window.ClipboardItem) { status("This browser can't copy images. Use Download instead."); return; }
