@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resume Builder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span id="agency-name" class="agency"></span>
+      <span id="agency-tagline" class="tagline"></span>
+    </div>
+    <div class="toolbar">
+      <button type="button" data-action="export">Save file</button>
+      <label class="button">
+        Open file
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
+      </label>
+      <button type="button" data-action="print" class="primary">Print / PDF</button>
+      <button type="button" data-action="reset" class="danger">Clear my data</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="editor" aria-label="Resume editor">
+      <div class="panel">
+        <h2>Profile</h2>
+        <label for="profile">Start from a layout</label>
+        <select id="profile"></select>
+        <p id="profile-desc" class="hint"></p>
+      </div>
+
+      <div class="panel">
+        <h2>Personal information</h2>
+        <div id="personal" class="grid"></div>
+      </div>
+
+      <div id="sections"></div>
+
+      <div class="panel add-section">
+        <h2>Add a section</h2>
+        <div class="row">
+          <label for="add-type" class="sr-only">Section type</label>
+          <select id="add-type"></select>
+          <button type="button" data-action="add-section" class="primary">Add</button>
+        </div>
+      </div>
+
+      <p id="privacy-note" class="hint privacy"></p>
+    </section>
+
+    <section class="preview-wrap" aria-label="Resume preview">
+      <article id="preview" class="page"></article>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
